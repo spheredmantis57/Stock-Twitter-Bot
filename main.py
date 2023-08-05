@@ -1,6 +1,5 @@
 """Main module for the stock twitter bot"""
 import argparse
-from datetime import date
 from os.path import abspath
 from common import emojis
 from common.custom_logging import basic_config, custom_log
@@ -12,7 +11,7 @@ DESIRED_PRICE = ["Date", "Open", "Close", "High", "Low", "% Price Change"]
 DESIRED_FTD = ["Date", "Failure to Deliver", "Price", "Amount (FTD x $)"]
 
 GME_TAGS = ["$GME #GME #GameStop #GMESTOP"]
-AMC_TAGS = ["$AMC #AMC #SECScandal", "#Ape #ThresholdList AMCSTOCK"]
+AMC_TAGS = ["$AMC #AMC #SECScandal", "#Ape #ThresholdList #AMCSTOCK"]
 SHARED_TAGS = ["#Moon #NeverLeaving #MOASS #ApesTogetherStrong", "#Squeeze #FTD #Bullish #NYSE"]
 
 def stringize_dict(dictionary, filter_keys=None):
@@ -51,8 +50,7 @@ def get_tweet(mode):
                  puller.pull_stocks_era_price,
                  DESIRED_PRICE)
 
-    frankenz_str = (f"\n{mode} Misc Stats{emojis.ROCKET}{emojis.APE}\n"
-                    f"Date: {date.today()}")
+    frankenz_str = f"\n{mode} Misc Stats{emojis.ROCKET}{emojis.APE}\n"
     frankenz_tup = (frankenz_str,
                     puller.pull_frankenz,
                     DESIRED_FRANKENZ)
@@ -79,10 +77,20 @@ def get_tweet(mode):
 
 def set_up():
     """Parses the args, configures logging, and builds tags"""
-    basic_config("log.txt")
-
     choices = ["AMC", "GME"]
-    parser = argparse.ArgumentParser(description="Set the mode.")
+    parser = argparse.ArgumentParser(description="Stock Twitter Bot")
+    parser.add_argument(
+        "--log",
+        type=str,
+        required=True,
+        help="The path to the log file",
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        required=True,
+        help="The path to the config json",
+    )
     parser.add_argument(
         "--mode",
         choices=choices,
@@ -93,6 +101,8 @@ def set_up():
                         help="Will actually send the tweet")
     args = parser.parse_args()
 
+    basic_config(args.log)
+    args.config = abspath(args.config)
     args.tags = None
     if args.mode == "AMC":
         args.tags = AMC_TAGS.copy()
