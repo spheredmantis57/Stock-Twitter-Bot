@@ -1,0 +1,8 @@
+ROCKET = "🚀"
+STONK = "📈"
+SSTONK = f"{STONK}🟢"
+FIRE = "🔥"
+APE = "🦍"
+MOON = "🌕"
+CASH = "💸"
+BAG = "💰"
