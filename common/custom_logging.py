@@ -1,6 +1,7 @@
 """Module for custom logging
 Uses the normal logging file but with filename and line number"""
 from inspect import currentframe
+from os.path import exists, dirname
 import logging
 
 def basic_config(file_name):
@@ -9,8 +10,15 @@ def basic_config(file_name):
     while still allowing you to change the logging file
 
     Arguments:
-    file_name (str): the name of the file to use for logging
+    file_name (str): abspath to file to use for logging
+
+    Raises:
+    FileNotFoundError if the path to the log file does not exist
     """
+    dir_name = dirname(file_name)
+    if not exists(dir_name):
+        raise FileNotFoundError(
+            f"Path to log file does not exist: {dir_name}")
     logging.basicConfig(
         level=logging.INFO,
         format='\n%(asctime)s - %(message)s',
