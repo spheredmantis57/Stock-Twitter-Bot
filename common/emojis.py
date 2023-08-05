@@ -1,3 +1,5 @@
+"""Module for emojis"""
+
 ROCKET = "🚀"
 STONK = "📈"
 SSTONK = f"{STONK}🟢"
