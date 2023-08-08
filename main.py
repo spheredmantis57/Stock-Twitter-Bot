@@ -1,6 +1,6 @@
 """Main module for the stock twitter bot"""
 import argparse
-from os.path import abspath
+from os.path import abspath, exists, dirname
 from common import emojis
 from common.custom_logging import basic_config, custom_log
 from stock_data import pull_data
@@ -50,7 +50,7 @@ def get_tweet(mode):
                  puller.pull_stocks_era_price,
                  DESIRED_PRICE)
 
-    frankenz_str = f"\n{mode} Misc Stats{emojis.ROCKET}{emojis.APE}\n"
+    frankenz_str = f"\n{mode} Misc Stats{emojis.ROCKET}{emojis.APE}"
     frankenz_tup = (frankenz_str,
                     puller.pull_frankenz,
                     DESIRED_FRANKENZ)
@@ -101,6 +101,8 @@ def set_up():
                         help="Will actually send the tweet")
     args = parser.parse_args()
 
+    if not exists(dirname(args.log)):
+        raise FileNotFoundError(f"Path to log file does not exist: {args.log}")
     basic_config(args.log)
     args.config = abspath(args.config)
     args.tags = None
@@ -113,12 +115,19 @@ def set_up():
 
 def main():
     """The main func of the program"""
-    args = set_up()
+    try:
+        args = set_up()
+    except FileNotFoundError as ex:
+        print(ex)
+        return
     tweet_message = get_tweet(args.mode)
     try:
-        _, client = get_api(abspath("twitter/.data.json"), args.mode)
+        _, client = get_api(abspath(args.config), args.mode)
     except KeyError:
         custom_log(f"JSON: {args.mode} is not yet set up")
+        return
+    except FileNotFoundError:
+        custom_log(f"JSON: {args.config} does not exist")
         return
     for message in tweet_message.split("\n\n"):
         tweet(client, message, args.tags, args.ndebug)
