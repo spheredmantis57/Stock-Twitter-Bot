@@ -202,7 +202,9 @@ def get_soup(url):
 
     Arguments:
     url (str): the url to get the soup of
-    returns BeautifulSoup of the website
+
+    Returns:
+    BeautifulSoup of the website or None if failed to pull
     """
     try:
         response = requests.get(url)
